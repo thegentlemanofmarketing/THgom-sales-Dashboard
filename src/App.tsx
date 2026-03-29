@@ -1,0 +1,745 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState, useEffect } from 'react';
+import { 
+  BookOpen, 
+  Briefcase, 
+  ChevronRight, 
+  CheckCircle, 
+  Copy, 
+  Globe, 
+  Scale, 
+  Home, 
+  Layout, 
+  Calendar, 
+  MessageSquare, 
+  Shield, 
+  Target, 
+  UserCheck, 
+  Stethoscope,
+  Quote
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
+// --- UTILITIES ---
+const copyToClipboard = (text: string, setCopied: (v: boolean) => void) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  } else {
+    let textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy', err);
+    }
+    textArea.remove();
+  }
+};
+
+// --- COMPONENTS ---
+
+const ScriptBox = ({ title, script }: { title: string; script: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm mt-3">
+      <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{title}</span>
+        <button 
+          onClick={() => copyToClipboard(script, setCopied)}
+          className="text-slate-400 hover:text-brand-gold transition-colors flex items-center gap-1 text-xs font-medium"
+        >
+          {copied ? <CheckCircle className="w-4 h-4 text-brand-gold" /> : <Copy className="w-4 h-4" />}
+          {copied ? 'COPIED' : 'COPY'}
+        </button>
+      </div>
+      <div className="p-4 text-sm text-slate-700 italic border-l-4 border-brand-gold bg-brand-gold-light/30">
+        "{script}"
+      </div>
+    </div>
+  );
+};
+
+// --- DATA ---
+
+const corePlaybook = [
+  {
+    day: 1,
+    title: "The Mindset & The Rule of One",
+    icon: <Target className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Amateurs try to sell everything to everyone. Professionals sell one specific outcome to one specific avatar.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h4 className="font-bold text-slate-800 flex items-center gap-2 mb-2"><UserCheck className="w-5 h-5 text-brand-gold"/> The Hero</h4>
+            <p className="text-sm text-slate-600">You speak only to Law Firms, Mortgage Brokers, Dentists, and High-Ticket Home Services.</p>
+          </div>
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h4 className="font-bold text-slate-800 flex items-center gap-2 mb-2"><Shield className="w-5 h-5 text-brand-gold-dark"/> The Villain</h4>
+            <p className="text-sm text-slate-600">"Marketing Noise" and the <strong>Experience Gap</strong>. They buy traffic, but websites are slow and follow-up is nonexistent.</p>
+          </div>
+        </div>
+        <div className="bg-brand-gold-light p-4 rounded-lg border border-brand-gold/30 mt-4">
+          <h4 className="font-bold text-brand-gold-dark mb-1">The Golden Rule</h4>
+          <p className="text-sm text-brand-gold-dark">You are the Guide. Never position yourself as the hero. The client is the hero; you simply hold the map.</p>
+        </div>
+      </div>
+    )
+  },
+  {
+    day: 2,
+    title: "The 'Warm Water' Strategy",
+    icon: <Globe className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Do not fish in cold water. Manufacture your own luck through proximity and network leverage.</p>
+        <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
+          <li><strong>Aggressive Curation:</strong> Add 100 targeted prospects (e.g., local roofers or attorneys) to your LinkedIn and Facebook networks.</li>
+          <li><strong>Proximity Leverage:</strong> Be present where business owners are (coffee shop, gym, networking groups).</li>
+        </ul>
+        <ScriptBox 
+          title="The Direct Network Tap (Send to existing contacts)"
+          script="Hey [Name], I just started helping [Lawyers] fix their digital infrastructure so they stop losing retained cases to slow follow-ups. Do you know anyone who might need that?"
+        />
+        <ScriptBox 
+          title="In-Person Elevator Pitch"
+          script="I build digital infrastructure for professional practices so they stop losing high-value clients to their competitors."
+        />
+      </div>
+    )
+  },
+  {
+    day: 3,
+    title: "The 'Hand Raiser' Inbound Trigger",
+    icon: <MessageSquare className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">We do not pitch. We agitate a problem and ask who wants the solution.</p>
+        <p className="text-sm text-slate-600"><strong>The Discipline:</strong> When they comment, do not push for a meeting. Follow the Day 4 protocol.</p>
+        <ScriptBox 
+          title="The Micro-Trigger Post (Post to curated feeds)"
+          script="Most [Mortgage Brokers] I talk to are tired of paying agencies for 'impressions'. You just want high-intent applications. If we could build a system that drops 30 to 50 exclusive applications into your pipeline this month, would you be interested in seeing how it works? Comment 'SYSTEM' and I will send you a 5-minute video showing the exact blueprint. No sales call required."
+        />
+      </div>
+    )
+  },
+  {
+    day: 4,
+    title: "The Frictionless Handoff",
+    icon: <Layout className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">When a prospect shows interest, do not demand a 60-minute Zoom call. Deliver the asset asynchronously.</p>
+        <p className="text-sm text-slate-600"><strong>The Psychology:</strong> By using absence, you increase respect. You give them consumption on their own terms.</p>
+        <ScriptBox 
+          title="The DM Script (For Hand Raisers)"
+          script="Hey [Name], thanks for raising your hand. As promised, I am not going to trap you on a calendar link. 🎩 Here is the 5-minute video showing exactly how the Precision Engine works: [Insert Link]. Watch it on your own time. If the math makes sense for your practice, you can actually start the onboarding right from that page. Zero pressure."
+        />
+      </div>
+    )
+  },
+  {
+    day: 5,
+    title: "The 'Stealth Audit' Outbound Method",
+    icon: <Briefcase className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">For high-value targets who have not raised their hand. Deliver upfront value without asking for their time.</p>
+        <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
+          <li><strong>The Target:</strong> Find 5 local, high-ticket businesses with poor Google Maps presence or slow websites.</li>
+          <li><strong>The Asset:</strong> Record a 3-minute Loom video reviewing their specific website.</li>
+        </ul>
+        <ScriptBox 
+          title="The Stealth Audit Loom Pitch"
+          script="Hey [Name], I was doing some research on [Law Firms] in [City] and came across your site. I found a few 'Experience Gaps' that are currently causing you to lose high-intent leads. I took the liberty of recording a quick video showing you exactly how to fix them. Click here to watch it."
+        />
+      </div>
+    )
+  },
+  {
+    day: 6,
+    title: "The 'Gatekeeper' Closing Method",
+    icon: <Shield className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Control the dynamic. Do not try to convince them to buy. Make them prove they are a fit.</p>
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+          <div>
+            <h4 className="font-bold text-slate-800 text-sm">The Ethical Reframe</h4>
+            <p className="text-sm text-slate-600">Before the call, they must fill out a brief application/diagnostic form. If they do not fill it out, they do not get the call.</p>
+          </div>
+          <div>
+            <h4 className="font-bold text-slate-800 text-sm">Handling "I Need To Think About It"</h4>
+            <p className="text-sm text-slate-600">If they hesitate, say: "I respect that. Most of our best clients do their due diligence. What specific part of the Engine do you need more clarity on?"</p>
+          </div>
+        </div>
+        <ScriptBox 
+          title="The Mirror Close (On the call)"
+          script="Based on what you put in your diagnostic, I think our Precision Engine is a perfect fit to solve your follow-up problem. The question is, do you think this is the right system for you?"
+        />
+      </div>
+    )
+  },
+  {
+    day: 7,
+    title: "Revenue Generating Activities (RGAs)",
+    icon: <Calendar className="w-6 h-6 text-brand-gold" />,
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">From this day forward, 80% of your time must be spent on RGAs. If a task does not directly generate a lead or close a deal, it is a distraction.</p>
+        <div className="bg-brand-gold-light/20 p-4 rounded-lg border border-brand-gold/20">
+          <h4 className="font-bold text-brand-gold-dark mb-2">The Daily Quota</h4>
+          <ul className="space-y-2 text-sm text-brand-gold-dark font-medium">
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Add 20 new targeted connections.</li>
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Publish 1 "Hand Raiser" post OR engage in 5 "Warm Water" conversations.</li>
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Send 3 "Stealth Audits" to high-value targets.</li>
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Send the 5-minute Loom video to EVERY prospect who shows interest.</li>
+          </ul>
+        </div>
+      </div>
+    )
+  }
+];
+
+const privatePlaybook = [
+  {
+    day: 1,
+    title: "The Universal Diagnosis",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Outside of core verticals, identify the single biggest pain point and offer one specific solution.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h4 className="font-bold text-slate-800 text-sm mb-1">The Universal Villain: "The Leaky Bucket"</h4>
+            <p className="text-sm text-slate-600">They are losing money to missed calls, bad online reviews, and slow follow-ups.</p>
+          </div>
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h4 className="font-bold text-slate-800 text-sm mb-1">The Universal Hero</h4>
+            <p className="text-sm text-slate-600">The business owner who is excellent at their craft but overwhelmed by digital operations.</p>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    day: 2,
+    title: "The 'Warm Water' Radius",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Proximity Psychology: People buy from those they are familiar with. Talk to businesses you patronize (your mechanic, gym owner, accountant).</p>
+        <ScriptBox 
+          title="The Script (Casual Conversation)"
+          script="I noticed you guys are incredibly busy. Quick question—what happens when someone calls the shop and you're too busy to answer? Do you have an automated text-back system set up so you don't lose that customer to the shop down the street?"
+        />
+      </div>
+    )
+  },
+  {
+    day: 3,
+    title: "Google Maps & The Stealth Audit",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Find businesses suffering from obvious digital decay (HVAC, Auto Repair, Med Spas with &lt;10 reviews or no website).</p>
+        <ScriptBox 
+          title="The Stealth Audit Pitch"
+          script="Hey [Name], I was looking for a [Service] in [City] today and came across your listing. I noticed a few 'Experience Gaps' that are currently driving your potential customers to your competitors. I took the liberty of recording a quick video showing you exactly how to seal these leaks. Click here to watch it."
+        />
+      </div>
+    )
+  },
+  {
+    day: 4,
+    title: "The 'Foot-in-the-Door' Offer",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Use a "Trojan Horse" offer ($300-$500/mo) to solve one painful problem and prove competence before pitching the $2,000/mo Precision Engine.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ScriptBox 
+            title="Offer A: Missed Call Text-Back"
+            script="Every missed call is a lost job. For $300 a month, we install a system that instantly texts back anyone you miss, capturing the lead before they call your competitor."
+          />
+          <ScriptBox 
+            title="Offer B: Reputation Management"
+            script="You are losing clients because your competitor has 150 reviews and you have 12. For $300 a month, we automate your review requests so every happy customer builds your digital authority."
+          />
+        </div>
+      </div>
+    )
+  },
+  {
+    day: 5,
+    title: "The Broad 'Hand Raiser' Trigger",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Post this on LinkedIn and local Facebook Business Groups to sell the promise, not the service.</p>
+        <ScriptBox 
+          title="The Broad Post"
+          script="Most local business owners are losing 30% of their revenue simply because they take too long to follow up with leads. If I could build you a system that automatically responds to every inquiry in under 5 minutes and books them directly onto your calendar, would you be interested in seeing how it works? Comment 'CALENDAR' below and I’ll send you a quick video breakdown. No sales call required."
+        />
+      </div>
+    )
+  },
+  {
+    day: 6,
+    title: "The Gatekeeper Close",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Maintain the power dynamic. Do not act desperate.</p>
+        <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
+          <li><strong>The Pre-Frame:</strong> They must fill out a brief Readiness Assessment before a call.</li>
+          <li><strong>Handling "Let Me Think About It":</strong> Say, "I respect that. The best clients do their due diligence. What specific part of the digital infrastructure do you need more clarity on?"</li>
+        </ul>
+        <ScriptBox 
+          title="The Mirror Close"
+          script="Based on your assessment, our infrastructure build can definitely solve your follow-up problem. The question is, do you think this is the right system for your business right now?"
+        />
+      </div>
+    )
+  },
+  {
+    day: 7,
+    title: "RGAs Only (Private Clients)",
+    content: (
+      <div className="space-y-4">
+        <p className="text-slate-600 font-medium">Amateurs spend time tweaking logos. Professionals spend time having conversations.</p>
+        <div className="bg-brand-gold-light/20 p-4 rounded-lg border border-brand-gold/20">
+          <h4 className="font-bold text-brand-gold-dark mb-2">The Daily Private Client Quota</h4>
+          <ul className="space-y-2 text-sm text-brand-gold-dark font-medium">
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> 5 "Warm Water" conversations with businesses you patronize.</li>
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> 5 "Stealth Audits" sent to Google Maps prospects.</li>
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> 1 "Hand Raiser" post on LinkedIn/Local FB.</li>
+            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Send Loom video to EVERY lead that responds.</li>
+          </ul>
+        </div>
+      </div>
+    )
+  }
+];
+
+const tailoredScripts = [
+  {
+    industry: "Mortgage Practices",
+    icon: <Home className="w-5 h-5 text-brand-gold" />,
+    hero: "Pre-approved, high-intent loan applications (not Zillow tire-kickers).",
+    hook: "Hey [Name], I saw you raised your hand on my post about getting 30 to 50 high-intent mortgage applications this month. I’m making this quick video because I know you’re busy closing loans and dealing with rate fluctuations, and I don't want to waste your time on a 60-minute Zoom call. At thegentlemanofmarketing.com, we believe in showing, not just telling. Let me show you exactly what happens when we plug your brokerage into our Precision Engine.",
+    outcome: "Most agencies want to sell you 'lead gen,' which usually means a spreadsheet of fake numbers and people who aren't ready to buy. I know you care about one thing: funded loans. Here is the actual outcome we deliver. Look at this pipeline from a campaign we ran for a broker just like you. These aren't just clicks; these are completed intake forms with credit scores over 700 and specific loan amounts requested. We bypass the 'Zillow window shoppers' and deliver borrowers who are actively asking for pre-approval right now.",
+    price: "Now, let’s talk about the investment. Price is irrelevant until you understand the outcome. Our Precision Growth system is $2,000 per month. It’s $2,000 a month against the 30 to 50 exclusive, high-intent applications you are going to receive. When you compare that investment to the commission of just one funded loan, the cost becomes a secondary logistical detail. It pays for itself immediately.",
+    objection: "You’re probably asking, 'Will this work in my specific local market where inventory is tight?'. Whether you are operating here in Orlando or in a small town in the Midwest, the answer is yes. The mechanics of capturing high-intent homebuyers do not change.",
+    close: "I don't do hour-long discovery calls or chase invoices. We work with professionals who value speed and discretion. Here is the price, and if you want to start, just click the button below this video. Enter your card details, and my team is notified instantly. Within 24 hours, we begin your Infrastructure Build. Let's get your pipeline full."
+  },
+  {
+    industry: "Law Practices",
+    icon: <Scale className="w-5 h-5 text-brand-gold" />,
+    hero: "High-value retained cases (not free-advice seekers).",
+    hook: "Hey [Name], I saw you raised your hand on my post about securing 10 to 20 high-value retained cases this month. I know your time is literally billed by the hour, so I’m not going to waste it on a 60-minute agency pitch. At thegentlemanofmarketing.com, we believe in showing, not just telling. Let me show you exactly what happens when your firm is plugged into our Precision Engine.",
+    outcome: "Most marketing companies will show you SEO charts and website traffic. I know you don't care about traffic; you care about high-value retainers and signed contracts. Listen to this 10-second clip from a campaign we ran for a firm just like yours. [Play Audio]. That is what our system does. We bypass the people looking for 'free legal advice' and capture the high-intent clients who are in immediate distress and need representation today.",
+    price: "Let’s talk about the investment. Our Precision Growth system is $2,000 per month. It’s $2,000 against the 10 to 20 highly qualified, exclusive case inquiries you will get. When you compare that to the settlement value or the retainer of just one solid case, the cost is practically negligible. It’s a mathematical certainty that it pays for itself.",
+    objection: "You might be wondering, 'Will this work in my specific county with my local competitors?'. Whether you are in downtown Orlando or a small rural county, the answer is yes. The mechanics of capturing people who urgently need legal help remain exactly the same.",
+    close: "We respect your time. I don't do proposals or long sales meetings. If you want to deploy this system, direct your attention to the button below this video. Enter your details on this secure checkout page, hit pay, and we are notified instantly. Within 24 hours, we begin building your firm's engine. Click the link, and let's get you your next big case."
+  },
+  {
+    industry: "Dental Practices",
+    icon: <Stethoscope className="w-5 h-5 text-brand-gold" />,
+    hero: "High-ticket procedures (Implants, Invisalign, Veneers).",
+    hook: "Hey [Name], I saw you raised your hand on my post about getting 20 to 30 high-ticket implant and cosmetic consultations this month. I’m making this quick video because I know you need to be in the chair treating patients, not on a 60-minute Zoom call with a marketing agency. At thegentlemanofmarketing.com, we show, we don't just tell. Let me show you what happens when we plug your practice into our Precision Engine.",
+    outcome: "Most agencies will talk to you about 'social media reach' or 'clicks.' I know that doesn't keep the lights on. You want patients in the chair for high-ticket procedures. Here is the actual outcome we deliver. Look at this schedule from a practice we partner with. These aren't just 'teeth cleaning' inquiries; these are direct bookings for implant consultations and full-mouth restorations. We target the patients who are already looking to spend money on their smile.",
+    price: "Let’s talk investment. Our Precision Growth system is $2,000 per month. It’s $2,000 a month against the 20 to 30 high-ticket consultations we will drop into your calendar. Considering the average value of a single dental implant or Invisalign case is between $3,000 and $5,000, this system pays for itself the moment just one of those patients says yes.",
+    objection: "You're likely asking, 'Will this work in my specific zip code where there are three other dentists on my street?'. The answer is yes. Whether you are in Orlando or a quiet suburb, patients are searching for high-end dental work. Our system ensures you are the only logical choice they see.",
+    close: "I don't do long discovery calls or chase you down for signatures. We work with doctors who value efficiency. Here is the exact price. If you are ready to fill your chairs with high-value cases, click the button below. Enter your card details on the secure page, and within 24 hours, we begin your Infrastructure Build. Let's grow your practice."
+  }
+];
+
+// --- SUB-COMPONENTS ---
+
+const PlaybookView = ({ data, title, subtitle }: { data: any[]; title: string; subtitle: string; key?: string }) => {
+  const [activeDay, setActiveDay] = useState(1);
+  const currentDayData = data.find(d => d.day === activeDay);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="animate-in"
+    >
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-slate-900">{title}</h2>
+        <p className="text-slate-500 mt-2">{subtitle}</p>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Navigation Sidebar */}
+        <div className="w-full lg:w-64 flex-shrink-0">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            {data.map((day) => (
+              <button
+                key={day.day}
+                onClick={() => setActiveDay(day.day)}
+                className={`w-full text-left px-4 py-4 border-b border-slate-100 flex items-center justify-between transition-colors
+                  ${activeDay === day.day ? 'bg-brand-gold-light border-l-4 border-l-brand-gold text-brand-gold-dark' : 'hover:bg-slate-50 text-slate-600'}`}
+              >
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider opacity-70 mb-1">Day {day.day}</div>
+                  <div className="text-sm font-medium">{day.title}</div>
+                </div>
+                <ChevronRight className={`w-4 h-4 ${activeDay === day.day ? 'text-brand-gold' : 'text-slate-300'}`} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8 min-h-[500px]">
+            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100">
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-800">
+                {currentDayData.day}
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900">{currentDayData.title}</h3>
+                <span className="text-brand-gold font-medium text-sm tracking-wide uppercase">Action Plan</span>
+              </div>
+            </div>
+            {currentDayData.content}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const ScriptLibrary = () => {
+  const [activeScript, setActiveScript] = useState(0);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="animate-in"
+    >
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-slate-900">Tailored Marketing Scripts</h2>
+        <p className="text-slate-500 mt-2">Loom Video outbound frameworks optimized for specific professional niches.</p>
+      </div>
+
+      {/* Script Navigation Tabs */}
+      <div className="flex overflow-x-auto gap-2 mb-6 pb-2">
+        {tailoredScripts.map((script, idx) => (
+          <button
+            key={idx}
+            onClick={() => setActiveScript(idx)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all
+              ${activeScript === idx ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+          >
+            {script.icon} {script.industry}
+          </button>
+        ))}
+      </div>
+
+      {/* Active Script Content */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-slate-900 p-6 text-white flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              {tailoredScripts[activeScript].icon}
+              {tailoredScripts[activeScript].industry} Playbook
+            </h3>
+            <p className="text-brand-gold text-sm mt-1 flex items-center gap-2">
+              <Target className="w-4 h-4" /> Hero's Desire: {tailoredScripts[activeScript].hero}
+            </p>
+          </div>
+        </div>
+        
+        <div className="p-6 md:p-8 space-y-6">
+          <ScriptBox title="[0:00 - 0:30] The Hook & Promise" script={tailoredScripts[activeScript].hook} />
+          <ScriptBox title="[0:30 - 1:45] The Outcome Demonstration" script={tailoredScripts[activeScript].outcome} />
+          <ScriptBox title="[1:45 - 2:30] The Contextualized Price" script={tailoredScripts[activeScript].price} />
+          <ScriptBox title="[2:30 - 3:15] The Unique Market Objection" script={tailoredScripts[activeScript].objection} />
+          <ScriptBox title="[3:15 - 5:00] The Frictionless Close" script={tailoredScripts[activeScript].close} />
+        </div>
+      </div>
+
+      {/* Tactical Review Board */}
+      <div className="mt-12 bg-slate-50 rounded-xl border border-slate-200 p-6">
+        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <Quote className="w-5 h-5 text-brand-gold" /> The Board's Tactical Review
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <h4 className="font-bold text-slate-800 text-sm">Peter Thiel (The Monopolist)</h4>
+            <p className="text-xs text-slate-600 italic">"By creating these specific verticals, you achieve micro-monopolies. When a dentist sees implant consults, they assume a 'Dental Secret'. You eliminate competition by speaking their language."</p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-bold text-slate-800 text-sm">Al Ries (The General)</h4>
+            <p className="text-xs text-slate-600 italic">"This is perfect positioning. The lawyer gets the 'Retainer' script. You own the specific word inside each prospect's mind. Do not mix them up."</p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-bold text-slate-800 text-sm">Donald Miller (The Guide)</h4>
+            <p className="text-xs text-slate-600 italic">"Notice we identified the specific 'Villain'. Mortgage: Zillow tire-kickers. Law: free-advice seekers. When you name their villain, they trust you as the Guide."</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const RgaTracker = () => {
+  const [todos, setTodos] = useState([
+    { id: 1, text: "Add 20 new targeted connections.", done: false, type: 'core' },
+    { id: 2, text: "Publish 1 'Hand Raiser' post OR engage 5 'Warm Water' convos.", done: false, type: 'core' },
+    { id: 3, text: "Send 3 'Stealth Audits' to high-value targets.", done: false, type: 'core' },
+    { id: 4, text: "Send 5-min Loom video to EVERY interested prospect.", done: false, type: 'core' },
+    { id: 5, text: "5 'Warm Water' conversations with businesses you patronize.", done: false, type: 'private' },
+    { id: 6, text: "5 'Stealth Audits' sent to Google Maps prospects.", done: false, type: 'private' },
+    { id: 7, text: "1 'Hand Raiser' post on LinkedIn/Local FB.", done: false, type: 'private' }
+  ]);
+
+  const toggleTodo = (id: number) => {
+    setTodos(todos.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+
+  const progress = Math.round((todos.filter(t => t.done).length / todos.length) * 100);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="animate-in max-w-3xl mx-auto"
+    >
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900">Daily RGA Tracker</h2>
+        <p className="text-slate-500 mt-2">80% of your day must be spent on Revenue Generating Activities.</p>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+        <div className="bg-brand-black p-6 text-white text-center">
+          <div className="text-5xl font-bold mb-2 text-brand-gold">{progress}%</div>
+          <div className="text-sm uppercase tracking-widest text-slate-400 font-bold">Daily Quota Completed</div>
+          
+          <div className="w-full bg-slate-800 rounded-full h-2 mt-6">
+            <div className="bg-brand-gold h-2 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <h3 className="font-bold text-slate-800 mb-4 uppercase tracking-wider text-xs flex items-center gap-2">
+            <Target className="w-4 h-4 text-brand-gold"/> Core Niche Quotas
+          </h3>
+          <div className="space-y-3 mb-8">
+            {todos.filter(t => t.type === 'core').map(todo => (
+              <button 
+                key={todo.id}
+                onClick={() => toggleTodo(todo.id)}
+                className={`w-full flex items-center gap-4 p-4 rounded-lg border text-left transition-all
+                  ${todo.done ? 'bg-brand-gold-light/20 border-brand-gold/30 text-brand-gold-dark' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'}`}
+              >
+                <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center
+                  ${todo.done ? 'border-brand-gold bg-brand-gold text-white' : 'border-slate-300'}`}>
+                  {todo.done && <CheckCircle className="w-4 h-4" />}
+                </div>
+                <span className={`font-medium ${todo.done ? 'line-through opacity-70' : ''}`}>{todo.text}</span>
+              </button>
+            ))}
+          </div>
+
+          <h3 className="font-bold text-slate-800 mb-4 uppercase tracking-wider text-xs flex items-center gap-2">
+            <Globe className="w-4 h-4 text-brand-gold"/> Private Client Quotas
+          </h3>
+          <div className="space-y-3">
+            {todos.filter(t => t.type === 'private').map(todo => (
+              <button 
+                key={todo.id}
+                onClick={() => toggleTodo(todo.id)}
+                className={`w-full flex items-center gap-4 p-4 rounded-lg border text-left transition-all
+                  ${todo.done ? 'bg-brand-gold-light/20 border-brand-gold/30 text-brand-gold-dark' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'}`}
+              >
+                <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center
+                  ${todo.done ? 'border-brand-gold bg-brand-gold text-white' : 'border-slate-300'}`}>
+                  {todo.done && <CheckCircle className="w-4 h-4" />}
+                </div>
+                <span className={`font-medium ${todo.done ? 'line-through opacity-70' : ''}`}>{todo.text}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// --- MAIN APP ---
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('welcome');
+
+  const navItems = [
+    { id: 'welcome', label: 'Overview', icon: <Target className="w-5 h-5" /> },
+    { id: 'core', label: 'Core Niches (7-Day)', icon: <BookOpen className="w-5 h-5" /> },
+    { id: 'private', label: 'Private Clients (7-Day)', icon: <Briefcase className="w-5 h-5" /> },
+    { id: 'scripts', label: 'Video Scripts', icon: <MessageSquare className="w-5 h-5" /> },
+    { id: 'rga', label: 'Daily RGA Tracker', icon: <CheckCircle className="w-5 h-5" /> },
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row">
+      
+      {/* Sidebar Navigation */}
+      <aside className="w-full md:w-72 bg-brand-black text-slate-300 flex-shrink-0 flex flex-col shadow-xl z-10">
+        <div className="p-6 md:p-8 border-b border-slate-800">
+          <div className="w-16 h-16 mb-4 flex items-center justify-center bg-brand-white/10 rounded-xl overflow-hidden">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-full h-full object-contain" 
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML = '<div class="text-brand-gold font-bold text-2xl">GM</div>';
+              }}
+            />
+          </div>
+          <h1 className="text-xl font-bold text-white tracking-wide uppercase">The Gentleman</h1>
+          <p className="text-xs text-brand-gold font-medium tracking-widest uppercase mt-1">ofmarketing.com</p>
+        </div>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 px-4 mt-4">Sales Attaché Portal</div>
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
+                ${activeTab === item.id 
+                  ? 'bg-brand-gold text-brand-white shadow-md' 
+                  : 'hover:bg-slate-800 hover:text-white'}`}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-6 border-t border-slate-800 text-xs text-slate-500">
+          Confidential Playbook © thegentlemanofmarketing.com
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-6 md:p-10 lg:p-14 max-w-6xl mx-auto">
+          
+          <AnimatePresence mode="wait">
+            {/* Welcome Screen */}
+            {activeTab === 'welcome' && (
+              <motion.div 
+                key="welcome"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="animate-in"
+              >
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="bg-brand-black p-12 md:p-20 text-center text-white relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_center,_var(--color-brand-gold)_0%,_transparent_70%)]"></div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="relative z-10"
+                    >
+                      <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight leading-tight">
+                        The Gentleman <br />
+                        <span className="text-brand-gold italic font-serif">of Marketing</span>
+                      </h1>
+                      <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
+                      <p className="text-lg md:text-2xl text-slate-300 max-w-3xl mx-auto font-light leading-relaxed">
+                        You were not hired to "hustle." You were not hired to cold call strangers and beg for their business.
+                      </p>
+                    </motion.div>
+                  </div>
+                  <div className="p-10 md:p-16">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      <div className="space-y-4">
+                        <div className="w-14 h-14 bg-brand-gold-light rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                          <Shield className="w-7 h-7 text-brand-gold-dark" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-slate-900">The Anti-Sales Philosophy</h3>
+                        <p className="text-slate-600 leading-relaxed text-lg">
+                          We do not operate in the pursuit model. Your job is to act as the architect of a system that generates "yes" responses. We sell a $2,000/month proprietary system called the <strong>Precision Engine</strong>, and we do it with absolute dignity.
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="w-14 h-14 bg-brand-gold-light rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                          <Briefcase className="w-7 h-7 text-brand-gold-dark" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-slate-900">Consultant, Not Solicitor</h3>
+                        <p className="text-slate-600 leading-relaxed text-lg">
+                          If you hand a generic manual to a rep, they resort to high-pressure tactics. This dashboard provides a lethal acquisition system built on high-leverage tactical frameworks and StoryBrand positioning.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-16 bg-brand-gold-light/30 rounded-2xl p-10 border border-brand-gold/20 text-center">
+                      <h4 className="text-2xl font-bold text-slate-900 mb-6">Ready to master the framework?</h4>
+                      <div className="flex flex-wrap justify-center gap-6">
+                        <button 
+                          onClick={() => setActiveTab('core')} 
+                          className="bg-brand-black hover:bg-brand-gold-dark text-white px-8 py-4 rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg flex items-center gap-2"
+                        >
+                          Start Core Playbook <ChevronRight className="w-5 h-5" />
+                        </button>
+                        <button 
+                          onClick={() => setActiveTab('private')} 
+                          className="bg-white hover:bg-slate-50 text-brand-black border border-brand-gold/30 px-8 py-4 rounded-xl font-bold transition-all transform hover:scale-105 shadow-sm"
+                        >
+                          Private Client Playbook
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Dynamic Playbook Views */}
+            {activeTab === 'core' && (
+              <PlaybookView 
+                key="core"
+                data={corePlaybook} 
+                title="7-Day Acquisition Playbook" 
+                subtitle="Targeting Law Firms, Mortgage Brokers, Dentists, and Home Services."
+              />
+            )}
+
+            {activeTab === 'private' && (
+              <PlaybookView 
+                key="private"
+                data={privatePlaybook} 
+                title="Private Client Playbook" 
+                subtitle="The universal digital diagnostician framework for the broader local market."
+              />
+            )}
+
+            {/* Script Library View */}
+            {activeTab === 'scripts' && <ScriptLibrary key="scripts" />}
+
+            {/* RGA Tracker View */}
+            {activeTab === 'rga' && <RgaTracker key="rga" />}
+          </AnimatePresence>
+
+        </div>
+      </main>
+    </div>
+  );
+}
